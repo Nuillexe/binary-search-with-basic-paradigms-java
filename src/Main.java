@@ -1,113 +1,128 @@
+// Autor: Emanuel [Seu Sobrenome Aqui]
+// Disciplina: Algoritmos e Programação - IFBA 2025.1
+// Trabalho Final
+
 import java.util.Scanner;
 
-
 public class Main {
-    static int numberElements=0;
-    public static void main(String[] args) {
-        Scanner scanner= new Scanner(System.in);
-        String[] namesList= new String[20];
-        boolean wishKeep=true;
-        int choose;
-        String enterName;
-        while(wishKeep){
-            printMenu();
+    static int quantidadeNomes = 0;
 
-            choose=scanner.nextInt();
-            scanner.nextLine();//fix a bug
-            switch (choose){
+    public static void main(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+        String[] listaDeNomes = new String[20];
+        boolean continuar = true;
+        int opcao;
+        String nomeDigitado;
+
+        while (continuar) {
+            mostrarMenu();
+
+            opcao = entrada.nextInt();
+            entrada.nextLine(); // Evita bug com quebra de linha
+
+            switch (opcao) {
                 case 1:
-                    System.out.println("Enter the name to will be recorder at the  name list");
-                    enterName=scanner.nextLine();
-                    recorderToList(namesList,enterName);
+                    System.out.println("Digite o nome que deseja cadastrar na lista:");
+                    nomeDigitado = entrada.nextLine();
+                    cadastrarNome(listaDeNomes, nomeDigitado);
                     break;
+
                 case 2:
-                    printList(namesList);
+                    listarNomes(listaDeNomes);
                     break;
+
                 case 3:
-                    System.out.println("Enter the name to will be searched at the name list");
-                    enterName= scanner.nextLine();
-                    if(binarySearch(enterName,namesList)==true){
-                        System.out.println("This name exist on the list");
-                    }else{
-                        System.out.println("This name don't exist");
+                    System.out.println("Digite o nome que deseja buscar na lista:");
+                    nomeDigitado = entrada.nextLine();
+                    if (buscaBinaria(nomeDigitado, listaDeNomes)) {
+                        System.out.println("Esse nome está na lista.");
+                    } else {
+                        System.out.println("Esse nome não foi encontrado.");
                     }
                     break;
-                default:
-                    System.out.println("Bye, bye....");
-                    wishKeep=false;
 
+                case 4:
+                    System.out.println("Saindo do programa... Até mais!");
+                    continuar = false;
+                    break;
+
+                default:
+                    System.out.println("Opção inválida. Escolha uma opção do menu.");
             }
         }
     }
 
-    static void printMenu(){
-        System.out.println("Would you choose a option, please");
-        System.out.printf(" 1-Recorder\n"+
-                "2- Show recorders\n"+
-                "3-Seach\n"+
-                "4-Get out\n");
+    static void mostrarMenu() {
+        System.out.println("**********************************");
+        System.out.println("Escolha uma opção:");
+        System.out.println("1 - Cadastrar nome");
+        System.out.println("2 - Listar nomes cadastrados");
+        System.out.println("3 - Buscar nome");
+        System.out.println("4 - Sair");
+        System.out.println("**********************************1\n");
     }
 
-    static void printList(String[] list){
-        int index=0;
-        while(list[index]!=null){
-            System.out.println("index "+index+" :"+list[index]);
-            index++;
+    static void listarNomes(String[] lista) {
+        int i = 0;
+        while (i < quantidadeNomes) {
+            System.out.println("Índice " + i + ": " + lista[i]);
+            i++;
         }
     }
-    static void recorderToList(String[] atList, String name){
-        if(isRepeatedName(name,atList)){
-            System.out.println("This name can not recorder,because" +
-                    "already exist a people with the same name at list");
-        }else{
-            register(name,atList);
+
+    static void cadastrarNome(String[] lista, String nome) {
+        if (nomeRepetido(nome, lista)) {
+            System.out.println("Não é possível cadastrar este nome, pois já existe na lista.");
+        } else {
+            if(quantidadeNomes>19){
+                System.out.println("Não é possível cadastrar este nome, pois na lista já existem 20 nomes");
+            }else {
+                lista[quantidadeNomes] = nome;
+                quantidadeNomes++;
+                ordenarLista(lista);
+                System.out.println("Nome cadastrado com sucesso!");
+            }
         }
-
     }
 
-    static void register(String name, String[] list){
-        list[numberElements]=name;
-        numberElements++;
-        sortList(list);
+    static boolean nomeRepetido(String nome, String[] lista) {
+        for (int i = 0; i < quantidadeNomes; i++) {
+            if (lista[i].equalsIgnoreCase(nome)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    static void sortList(String[] list){
+    static void ordenarLista(String[] lista) {
         String aux;
-        for(int i=0;i<numberElements;i++){
-            for(int j=0; j<numberElements; j++){
-                if(list[i].compareTo(list[j])<0){
-                    aux=list[i];
-                    list[i]=list[j];
-                    list[j]=aux;
+        for (int i = 0; i < quantidadeNomes - 1; i++) {
+            for (int j = i + 1; j < quantidadeNomes; j++) {
+                if (lista[i].compareToIgnoreCase(lista[j]) > 0) {
+                    aux = lista[i];
+                    lista[i] = lista[j];
+                    lista[j] = aux;
                 }
             }
         }
     }
 
-    static boolean isRepeatedName(String name, String[] atList){
-        boolean isRepeatedName=false;
-        for(String listName:atList){
-            if(name.equalsIgnoreCase(listName))
-                isRepeatedName=true;
-        }
-        return  isRepeatedName;
-    }
+    static boolean buscaBinaria(String nome, String[] lista) {
+        int inicio = 0;
+        int fim = quantidadeNomes - 1;
+        int meio;
 
+        while (inicio <= fim) {
+            meio = (inicio + fim) / 2;
 
-    static boolean binarySearch(String name, String[] lista){
-        boolean numberFinded=false;
-        int back=0, front=numberElements-1, middle;
-        while((back<=front)&&(!numberFinded)){
-            middle=(back+front)/2;
-            if(lista[middle].compareToIgnoreCase(name)<0){
-                back=middle+1;
-            } else if (lista[middle].compareToIgnoreCase(name)>0) {
-                front=middle-1;
-            }else{
-                numberFinded=true;
+            if (lista[meio].compareToIgnoreCase(nome) < 0) {
+                inicio = meio + 1;
+            } else if (lista[meio].compareToIgnoreCase(nome) > 0) {
+                fim = meio - 1;
+            } else {
+                return true;
             }
         }
-        return numberFinded;
+        return false;
     }
-
 }
